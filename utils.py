@@ -17,6 +17,19 @@ DROP_COLS = [
     "proppant_to_frac_fluid_ratio",
     "frac_fluid_to_proppant_ratio",
     "frac_seasoning",
+    # adding after incorporating weak learner
+    'horizontal_midpoint_x',
+    'horizontal_midpoint_y',
+    'horizontal_toe_x',
+    'horizontal_toe_y',
+    'surface_toe_len', 
+    'toe_midpoint_len', 'toe_bh_len',
+    'midpoint_bh_len', 'lateral_len',
+    'surface_toe_len', 'toe_midpoint_len',
+    'toe_bh_len', 'midpoint_bh_len',
+    'lateral_len', 'custom_average_proppant',
+    'proppant_intensity', 'frac_fluid_intensity',
+    'pad_id'
 ]
 
 RAW_DATA = pd.read_csv(DATA_PATH, index_col=0)
@@ -31,7 +44,6 @@ def preprocess_data(data):
     data["midpoint_bh_len"] = np.sqrt((data.horizontal_midpoint_x - data.bh_x).to_numpy() ** 2 + (data.horizontal_midpoint_y - data.bh_y).to_numpy() ** 2)
 
     data["lateral_len"] = data.toe_midpoint_len * 2 # proxy a number of stages de pipe
-
 
     data["custom_average_proppant"] = data.total_proppant / data.surface_toe_len
 
