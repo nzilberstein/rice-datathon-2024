@@ -12,7 +12,6 @@ DROP_COLS = [
     "average_stage_length",
     "average_proppant_per_stage",
     "average_frac_fluid_per_stage",
-    "average_stage_length",
     "average_proppant_per_stage",
     "average_frac_fluid_per_stage",
     "proppant_to_frac_fluid_ratio",
