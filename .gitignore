@@ -1,1 +1,4 @@
 notebooks/*
+wandb/*
+wandb
+__pycache__

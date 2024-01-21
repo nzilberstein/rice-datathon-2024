@@ -128,13 +128,15 @@ def preprocess_modeling_data(preprocessed, ohe=True, mean_imputation=True):
     Prepare dataset for modeling
     """
 
-    cluster_features = pd.read_csv("data/cluster_label_features.csv")
-    cluster_features.rename(columns={"Unnamed: 0": "original_index"}, inplace=True)
+    # cluster_features = pd.read_csv("data/cluster_label_features.csv")
+    # cluster_features.rename(columns={"Unnamed: 0": "original_index"}, inplace=True)
 
-    cluster_features = cluster_features[["original_index", "cluster", "opr_mean_pct_diff"]].copy()
+    # cluster_features = cluster_features[["original_index", "cluster", "opr_mean_pct_diff"]].copy()
 
-    preprocessed = preprocessed.merge(cluster_features, right_on="original_index", left_index=True)
-    preprocessed.drop(columns=["original_index"], inplace=True)
+    # preprocessed = preprocessed.merge(cluster_features, right_on="original_index", left_index=True)
+    # preprocessed.drop(columns=["original_index"], inplace=True)
+
+    # pri
 
     if mean_imputation:
         preprocessed["gross_perforated_length"] = preprocessed["gross_perforated_length"].fillna(preprocessed["gross_perforated_length"].mean())
@@ -165,7 +167,7 @@ def preprocess_modeling_data(preprocessed, ohe=True, mean_imputation=True):
             preprocessed = pd.concat([preprocessed, pd.get_dummies(preprocessed[col], prefix=col)], axis=1)
             preprocessed.drop(columns=[col], inplace=True)
 
-    preprocessed.drop(columns=["cluster"], inplace=True)
+    # preprocessed.drop(columns=["cluster"], inplace=True)
     
     return preprocessed
 
@@ -173,7 +175,20 @@ def preprocess_modeling_data(preprocessed, ohe=True, mean_imputation=True):
 
 if __name__ == "__main__":
     preprocessed = preprocess_data(RAW_DATA)
+    print("Preprocessed data shape:")
+    print(preprocessed.shape)
 
-    final = preprocess_modeling_data(preprocessed)
+    final = preprocess_modeling_data(preprocessed, ohe=False)
+
+    final.drop(columns=["ffs_frac_type",
+        "relative_well_position",
+        "batch_frac_classification",
+        "well_family_relationship",
+        "bin_lateral_length",
+        "number_of_lateral_stages"
+        ], inplace=True)
+
+    print("Final data shape:")
+    print(final.shape)
     final.to_csv("data/final.csv", index=False)
 
