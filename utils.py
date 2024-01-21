@@ -65,6 +65,9 @@ def preprocess_data(data):
     data["number_of_lateral_stages"].fillna(data["predicted_number_of_lateral_stages"], inplace=True)
     data.drop(columns=["predicted_number_of_lateral_stages", "average_stage_length"], inplace=True)
 
+    data["sibling_well"] = (data["well_family_relationship"] == "Sibling Well").astype(int)
+    data["batch_concurrent_frac"] = data['batch_frac_classification'] == ("Batch-Concurrent Frac").astype(int)
+
     data.drop(columns=DROP_COLS, inplace=True)
 
     data.to_csv(os.path.join(os.path.dirname(__file__), "data", "preprocessed.csv"), index=False)
