@@ -69,6 +69,7 @@ def preprocess_data(data):
 
     data.to_csv(os.path.join(os.path.dirname(__file__), "data", "preprocessed.csv"), index=False)
 
+    return data
 
 def estimate_stages(data_original, stages_to_estimate):
     data = data_original.copy()
@@ -122,7 +123,57 @@ def estimate_stages(data_original, stages_to_estimate):
 
     return y_test
 
+def preprocess_modeling_data(preprocessed, ohe=True, mean_imputation=True):
+    """
+    Prepare dataset for modeling
+    """
+
+    cluster_features = pd.read_csv("data/cluster_label_features.csv")
+    cluster_features.rename(columns={"Unnamed: 0": "original_index"}, inplace=True)
+
+    cluster_features = cluster_features[["original_index", "cluster", "opr_mean_pct_diff"]].copy()
+
+    preprocessed = preprocessed.merge(cluster_features, right_on="original_index", left_index=True)
+    preprocessed.drop(columns=["original_index"], inplace=True)
+
+    if mean_imputation:
+        preprocessed["gross_perforated_length"] = preprocessed["gross_perforated_length"].fillna(preprocessed["gross_perforated_length"].mean())
+        preprocessed["total_proppant"] = preprocessed["total_proppant"].fillna(preprocessed["total_proppant"].mean())
+        preprocessed["total_fluid"] = preprocessed["total_fluid"].fillna(preprocessed["total_fluid"].mean())
+        preprocessed["bin_lateral_length"] = preprocessed["bin_lateral_length"].fillna(preprocessed["bin_lateral_length"].mean())
+        preprocessed["true_vertical_depth"] = preprocessed["true_vertical_depth"].fillna(preprocessed["true_vertical_depth"].mean())
+
+    preprocessed.ffs_frac_type = preprocessed.ffs_frac_type.fillna("Undefined").map({
+                                                        "Slickwater Crosslink Hybrid": "sch",
+                                                        "Slickwater Only": "so",
+                                                        "8810.144334222554": "number",
+                                                        "Slickwater Linear Hybrid": "slh",
+                                                        "Undefined": "undefined",
+                                                        "Crosslink Only": "co",
+                                                        "Linear Only": "lo",
+                                                    })
+    preprocessed.ffs_frac_type.value_counts(dropna=False)
+
+    if ohe:
+        # One Hot Encode data
+        ohe_cols = ["ffs_frac_type",
+        "relative_well_position",
+        "batch_frac_classification",
+        "well_family_relationship"]
+
+        for col in ohe_cols:
+            preprocessed = pd.concat([preprocessed, pd.get_dummies(preprocessed[col], prefix=col)], axis=1)
+            preprocessed.drop(columns=[col], inplace=True)
+
+    preprocessed.drop(columns=["cluster"], inplace=True)
+    
+    return preprocessed
+
+
 
 if __name__ == "__main__":
-    preprocess_data(RAW_DATA)
+    preprocessed = preprocess_data(RAW_DATA)
+
+    final = preprocess_modeling_data(preprocessed)
+    final.to_csv("data/final.csv", index=False)
 
