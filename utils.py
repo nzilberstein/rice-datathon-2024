@@ -59,7 +59,6 @@ def preprocess_data(data):
     data["number_of_stages"].fillna(data["predicted_number_of_total_stages"], inplace=True)
     data.drop(columns=["predicted_number_of_total_stages"], inplace=True)
     
-    
     # overwrite computed number of stages in the lateral
     # data.drop(columns=["average_stage_length"], inplace=True) # we don't need this anymore
     data["number_of_lateral_stages"] = data["bin_lateral_length"] * data["average_stage_length"]
@@ -68,7 +67,7 @@ def preprocess_data(data):
 
     data.drop(columns=DROP_COLS, inplace=True)
 
-    data.to_csv(os.path.join(os.path.dirname(__file__), "data", "PREPRO-SAMPLE-1.csv"), index=False)
+    data.to_csv(os.path.join(os.path.dirname(__file__), "data", "preprocessed.csv"), index=False)
 
 
 def estimate_stages(data_original, stages_to_estimate):
